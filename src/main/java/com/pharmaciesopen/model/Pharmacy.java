@@ -23,7 +23,7 @@ public class Pharmacy implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int id;
-	@Column(name="name")
+	@Column(name="name", unique=true)
 	private String name;
 	@ElementCollection(fetch=FetchType.EAGER)
 	@CollectionTable(name="phones_numbers")

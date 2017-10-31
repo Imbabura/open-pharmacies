@@ -1,9 +1,9 @@
 package com.pharmaciesopen.controllers;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import org.json.JSONException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -26,16 +26,39 @@ public class PharmacyControllerTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 	private static final String URL_BASE= "/api/pharmacies";
+	private Address addressMock;
+	private Pharmacy pharmacy, anotherPharmacy;
+	
+	@Before
+	public void setUp() {
+		addressMock= Mockito.mock(Address.class);
+		pharmacy= new Pharmacy("Pharmacy1", new ArrayList<String>(), addressMock);
+		anotherPharmacy= new Pharmacy("Pharmacy2", new ArrayList<String>(), addressMock);
+	}
 	
 	@Test
-    public void testGetPharmacy() throws JSONException {
-		Address addressMock= Mockito.mock(Address.class);
-		Pharmacy persistedPharmacy= new Pharmacy("Pharmacy90", new ArrayList<String>(), addressMock);
-		pharmacyService.addPharmacy(persistedPharmacy);
-    	ResponseEntity<Pharmacy> entity= getRestTemplate().getForEntity(URL_BASE + "/" + persistedPharmacy.getId(), Pharmacy.class);
-    	System.out.println(entity.getStatusCode());
+    public void testGetPharmacy() {
+		pharmacyService.addPharmacy(pharmacy);
+		ResponseEntity<Pharmacy> entity= getRestTemplate().getForEntity(URL_BASE + "/" + pharmacy.getId(), Pharmacy.class);
     	assertTrue(entity.getStatusCode().equals(HttpStatus.OK));
-		assertTrue(entity.getBody().getName().equals(persistedPharmacy.getName()));
+		assertTrue(entity.getBody().getName().equals(pharmacy.getName()));
+    }
+	
+	@Test
+    public void testGetAllPharmacies() {
+		int previousNumberOfPharmacies= getRestTemplate().getForEntity(URL_BASE + "/list", Pharmacy[].class).getBody().length;
+		pharmacyService.addPharmacy(anotherPharmacy);
+    	ResponseEntity<Pharmacy[]> entities= getRestTemplate().getForEntity(URL_BASE + "/list", Pharmacy[].class);
+    	assertTrue(entities.getStatusCode().equals(HttpStatus.OK));
+		assertEquals(previousNumberOfPharmacies + 1, entities.getBody().length);
+    }
+	
+	@Test
+    public void testAddPharmacy() {
+		Pharmacy pharmacy= new Pharmacy("Pharmacy3", new ArrayList<String>(), null);
+    	ResponseEntity<Pharmacy> entity= getRestTemplate().postForEntity(URL_BASE + "/add", pharmacy, Pharmacy.class);
+    	assertTrue(entity.getStatusCode().equals(HttpStatus.OK));
+    	assertTrue(entity.getBody().getName().equals(pharmacy.getName()));
     }
 	
     public TestRestTemplate getRestTemplate() {
