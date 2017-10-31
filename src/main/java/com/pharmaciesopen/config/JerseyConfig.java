@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
-@ApplicationPath("/api")
+@ApplicationPath("api")
 public class JerseyConfig extends ResourceConfig {
 	
 	public JerseyConfig() {}
@@ -23,17 +23,17 @@ public class JerseyConfig extends ResourceConfig {
 	}
 	
 	@Provider
-	  public static class ObjectMapperContextResolver implements ContextResolver<ObjectMapper> {
-	 
-	    private final ObjectMapper mapper;
-	    @Autowired
-	    public ObjectMapperContextResolver(ObjectMapper mapper) {
-	      this.mapper = mapper;
-	    }
-	    
-	    @Override
-	    public ObjectMapper getContext(Class<?> type) {
-	      return mapper;
-	    }
-	  }
+	 public static class ObjectMapperContextResolver implements ContextResolver<ObjectMapper> {
+		private final ObjectMapper mapper;
+		
+		@Autowired
+		public ObjectMapperContextResolver(ObjectMapper mapper) {
+			this.mapper = mapper;
+		}
+		
+		@Override
+		public ObjectMapper getContext(Class<?> type) {
+			return mapper;
+		}
+	 }
 }
